@@ -1,4 +1,4 @@
-# MwM // Meta-Tilling Window Manager
+# MwM // Meta-Tilling Window Manager ![alt text][mwmkip]
 
 ## Why?
 - I had a dream, where all windows where treated eqaully (almost)
@@ -25,3 +25,5 @@
 - Meta-tilling
 - Client
 - *basically all*
+
+[mwmkip]: mumkip.png
