@@ -1,4 +1,5 @@
-# MwM // Meta-Tilling Window Manager ![alt text][mwmkip]
+# MwM // Meta-Tilling Window Manager 
+<img src="https://github.com/Eduarch42/mwm/blob/master/mwmkip.png" width="500" height="500">
 
 ## Why?
 - I had a dream, where all windows where treated eqaully (almost)
@@ -25,5 +26,3 @@
 - Meta-tilling
 - Client
 - *basically all*
-
-[mwmkip]: https://github.com/Eduarch42/mwm/blob/master/mwmkip.png
