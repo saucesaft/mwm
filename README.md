@@ -26,4 +26,4 @@
 - Client
 - *basically all*
 
-[mwmkip]: mumkip.png
+[mwmkip]: https://github.com/Eduarch42/mwm/blob/master/mwmkip.png
