@@ -1,5 +1,5 @@
 # MwM // Meta-Tilling Window Manager 
-<img src="https://github.com/Eduarch42/mwm/blob/master/mwmkip.png" width="500" height="500">
+<img src="https://github.com/Eduarch42/mwm/blob/master/mwmkip.png" width="380" height="380">
 
 ## Why?
 - I had a dream, where all windows where treated eqaully (almost)
