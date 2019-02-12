@@ -1,5 +1,6 @@
 # MwM // Meta-Tilling Window Manager 
-<img src="https://github.com/Eduarch42/mwm/blob/master/mwmkip.png" width="380" height="380">
+<img src="https://github.com/Eduarch42/mwm/blob/master/mwmkip.png" width="320" height="320">
+The official mascot of mwm, mwmkip.
 
 ## Why?
 - I had a dream, where all windows where treated eqaully (almost)
