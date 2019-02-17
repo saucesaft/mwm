@@ -3,7 +3,7 @@
 The official mascot of mwm, mwmkip.
 
 ## Why?
-- I had a dream, where all windows where treated eqaully (almost)
+- I had a dream, where all windows where treated equally (almost)
 - Its like tilling, but with the freadom of floating
 - The lost child of bspwm and openbox
 - The name looks like a face

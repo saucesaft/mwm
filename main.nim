@@ -1,3 +1,5 @@
+import typetraits
+
 import strutils, strmisc
 
 import os, threadpool
@@ -16,11 +18,11 @@ converter toBool(x: TBool): bool = x.bool
 
 type
   keybind = tuple[mods, keys, cmd: string]
-  client = tuple[x, y, w, h: int, win: TWindow]
 
 var
   dummy: keybind = (mods: "", keys: "", cmd: "")
   keybinds = @[dummy]
+
 
 var
 
@@ -70,9 +72,9 @@ proc parseCmd(command: string) =
     discard spawn execShellCmd(parsedCmd[2])
 
 # parse the keypresses
-proc handleKeypress(caca: TXevent) =
+proc handleKeypress(event: TXevent) =
   var 
-    eve = caca.xkey
+    eve = event.xkey
     keycode = cast[TKeyCode](eve.keycode)
     keysym = XKeycodeToKeysym(display, keycode, 0)
     casekeysym = XkeysymToString(keysym)
@@ -85,6 +87,27 @@ proc handleKeypress(caca: TXevent) =
   
     if casekeysym == i.keys and eve.state == newMod:
       parseCmd(i.cmd)
+
+### X Event Handlers ###
+
+# configure request handler
+proc handleConfigureRequest(event: TXEvent) =
+#  echo event.xconfigurerequest
+  var
+    e: TXConfigureRequestEvent = event.xconfigurerequest
+    wc: TXWindowChanges
+    
+  wc = TXWindowChanges(x: e.x, y: e.y, width: e.width-50, height: e.height,
+   border_width: e.border_width, sibling: e.above, stack_mode: e.detail)
+
+  var wcp = addr wc
+
+  discard XConfigureWindow(display, e.window, cast[cuint](e.value_mask), wcp)
+
+# map request handler
+proc handleMapRequest(event: TXEvent) =
+  discard XMapWindow(display, event.xmaprequest.window)
+
 
 # procedure which sets up mwm 
 proc setup =
@@ -107,27 +130,32 @@ proc setup =
    true, ButtonPressMask, GrabModeAsync, GrabModeAsync, None, None)
     
   grabKeypress()
+
+  discard XSelectInput(display, root, SubstructureRedirectMask)
   
 # main procedure which runs it all
 proc main =
 
   setup()
+
+  discard XSync(display, false)
   
   while true:
   
     discard XNextEvent(display,ev.addr)
   
     case ev.theType:
-
       of ConfigureRequest:
-        echo "wanting to get configured"
-    
+
+        echo "window wants to be configured"
+
+        handleConfigureRequest(ev)
+
       of MapRequest:
-        var 
-          wa: TXWindowAttributes
-          ev: TXMapRequestEvent = ev.xmaprequest
-        echo "lol, its working"
-        echo ev.window
+
+        echo "window wants to be mapped"
+
+        handleMapRequest(ev)
   
       of KeyPress: # Will only register the ones from XGrabKey
 
@@ -174,11 +202,13 @@ proc main =
                                   max(1, attr.width + (if start.button==3: xdiff else: 0)),
   
                                   max(1, attr.height + (if start.button==3: ydiff else: 0)))
-                                 
   
       of ButtonRelease:
   
         discard XUngrabPointer(display, CurrentTime)
+        
+      of EnterNotify:
+        echo("hell yeah")
   
       else: # Ignore unknown events
   
