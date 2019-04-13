@@ -6,29 +6,35 @@ import (
     "encoding/gob"
 	"os/exec"
 	"log"
+	s"strings"
 )
 
-type P struct {
+type P struct { // special struct for sending things
     M string
 }
 
-func runCommand(cmd *P) {
+func addKey(cmd *P) { // adds keybinds to struct
+	complete := s.Split(cmd.M, "/")
+	newKeybind := &keybind{complete[0], complete[1:]}
+	keybinds = append(keybinds, newKeybind)
+}
+
+func runCommand(cmd *P) { // runs shell commands
 	hey := exec.Command(cmd.M)
 	if err := hey.Run(); err != nil {
 		log.Fatal(err)
 	}	
 }
 
-func handleConnection(conn net.Conn) {
+func handleConnection(conn net.Conn) { // ran every time needs to send something to mwm
     dec := gob.NewDecoder(conn)
     p := &P{}
     dec.Decode(p)
-//    runCommand(p)
-	fmt.Println(p.M)
+	addKey(p)
     conn.Close()
 }
 
-func startIPC() {
+func startIPC() { // start the ipc listener func
     fmt.Println("ipc started");
    ln, err := net.Listen("tcp", ":8080")
     if err != nil {

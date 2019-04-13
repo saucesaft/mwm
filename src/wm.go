@@ -9,15 +9,17 @@ import (
 )
 
 type keybind struct {
-	mods, keys, cmd string
+	keys string
+	cmd []string
 }
 
 var (
 	conn *xgb.Conn // connection to the x server
 
-	dummy = keybind{"TESTMOD","TESTKEY","TESTCMD"}
+	testcmd = []string{"test1", "test2"}
+	dummy = &keybind{"TESTKEY", testcmd}
 //	kb1 = keybind{"mod4","shift","spawn xterm"}
-	keybinds = []keybind{dummy}
+	keybinds = []*keybind{dummy}
 )
 
 func init() {
