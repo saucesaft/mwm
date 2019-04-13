@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt" 
-	"bufio"
 	"log"
 	"github.com/BurntSushi/xgb"
 	"github.com/BurntSushi/xgb/xinerama"
@@ -17,8 +16,8 @@ var (
 	conn *xgb.Conn // connection to the x server
 
 	dummy = keybind{"TESTMOD","TESTKEY","TESTCMD"}
-	kb1 = keybind{"mod4","shift","spawn xterm"}
-	keybinds = []keybind{dummy, kb1}
+//	kb1 = keybind{"mod4","shift","spawn xterm"}
+	keybinds = []keybind{dummy}
 )
 
 func init() {
@@ -27,7 +26,7 @@ func init() {
 
 func setup() {
 	var err error
-	conn, err = xgb.NewConn()
+	conn, err = xgb.NewConn() // initialize connection
 	if err != nil {
 		panic(err)
 	} else if conn == nil {
@@ -40,12 +39,8 @@ func setup() {
 		panic(err)
 	}
 
-	screen := info.DefaultScreen(conn)
-	root := screen.Root
-
-	parseConfig()
-
-//	xp.GrabKey(conn, false, root, xp.ModMask1, xp.Keycode('a'), xp.GrabModeAsync, xp.GrabModeAsync)
+	screen := info.DefaultScreen(conn) // dont know
+	root := screen.Root // assign root window
 	
 	err = xp.ChangeWindowAttributesChecked(
 			conn,
@@ -60,9 +55,14 @@ func setup() {
 				panic(err)
 			}
 	}	
-	
 
+	go startIPC() // start ipc listener
+	
 	fmt.Println("setup done")	
+}
+
+func handleKeypress() {
+	
 }
 
 func main() {
@@ -74,7 +74,7 @@ func main() {
 				fmt.Println("Both event and error are nil. Exiting...")
 				return
 			}
-			switch v := ev.(type){
+			switch v := ev.(type){ // switch statement for X events
 
 			case xp.KeyPressEvent:
 				fmt.Println("Key pressed!", v.State)

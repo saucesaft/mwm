@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+mod=mod4 # you can also use ctrl and alt
+
+## bindings ##
+
+hydro bind mod+enter xterm
+
+## autostart ##

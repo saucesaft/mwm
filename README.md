@@ -10,13 +10,13 @@ The official mascot of mwm, mwmkip.
 - Is this loss?
 
 ## Features
-- Included client for scripting
-- Easy to read config file
+- Included IPC client for in config scripting
 - Meta-tilling 
 - Minimalistic
 - Dynamic window borders
 
-## How?
+## Progress
+12/04/19 - Rewrote everything in Go, creation of client with IPC
 
 ## TODO
 - Closing windows
