@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+## start bindings daemon ##
+sxhkd -c ./sxhkdrc

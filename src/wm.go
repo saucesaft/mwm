@@ -8,6 +8,8 @@ import (
 	xp "github.com/BurntSushi/xgb/xproto"
 )
 
+var keymap [256][]xp.Keysym
+
 type keybind struct {
 	keys string
 	cmd []string
@@ -41,7 +43,7 @@ func setup() {
 		panic(err)
 	}
 
-	screen := info.DefaultScreen(conn) // dont know
+	screen := info.DefaultScreen(conn) // get the screen
 	root := screen.Root // assign root window
 	
 	err = xp.ChangeWindowAttributesChecked(
@@ -56,7 +58,31 @@ func setup() {
 				fmt.Println("Could not become the WM. Is another WM already running?")
 				panic(err)
 			}
-	}	
+	}
+
+//	xp.ChangeKeyboardMapping(conn, byte(42), xp.Keycode(65), byte(23), []xp.Keysym{})
+
+	const (
+		loKey = 8
+		hiKey = 255
+	)
+
+	m := xp.GetKeyboardMapping(conn, loKey, hiKey-loKey+1)
+
+	reply, err := m.Reply()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if reply == nil {
+		log.Fatal("Could not load keyboard map")
+	}
+
+	for i := 0; i < hiKey-loKey+1; i++ {
+		keymap[loKey+i] = reply.Keysyms[i*int(reply.KeysymsPerKeycode) : (i+1)*int(reply.KeysymsPerKeycode)]
+	}
+
+	fmt.Println(keymap)	
 
 	go startIPC() // start ipc listener
 	
@@ -79,7 +105,7 @@ func main() {
 			switch v := ev.(type){ // switch statement for X events
 
 			case xp.KeyPressEvent:
-				fmt.Println("Key pressed!", v.State)
+				fmt.Println("Key pressed!", xp.Keysym(v.Detail))
 			default:
 				fmt.Println(v)
 			}
