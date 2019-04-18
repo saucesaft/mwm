@@ -6,18 +6,18 @@ import (
     "encoding/gob"
 	"os/exec"
 	"log"
-	s"strings"
+//	s"strings"
 )
 
 type P struct { // special struct for sending things
     M string
 }
 
-func addKey(cmd *P) { // adds keybinds to struct
-	complete := s.Split(cmd.M, "/")
-	newKeybind := &keybind{complete[0], complete[1:]}
-	keybinds = append(keybinds, newKeybind)
-}
+//func addKey(cmd *P) { // adds keybinds to struct
+//	complete := s.Split(cmd.M, "/")
+//	newKeybind := &keybind{complete[0], complete[1:]}
+//	keybinds = append(keybinds, newKeybind)
+//}
 
 func runCommand(cmd *P) { // runs shell commands
 	hey := exec.Command(cmd.M)
@@ -30,7 +30,7 @@ func handleConnection(conn net.Conn) { // ran every time needs to send something
     dec := gob.NewDecoder(conn)
     p := &P{}
     dec.Decode(p)
-	addKey(p)
+	fmt.Println(p)
     conn.Close()
 }
 

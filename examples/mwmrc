@@ -1,4 +1,5 @@
 #!/usr/bin/bash
 
 ## start bindings daemon ##
-sxhkd -c ./sxhkdrc
+sxhkd -c ~/repos/mwm/examples/sxhkdrc
+echo "exito!"

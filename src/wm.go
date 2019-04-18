@@ -3,29 +3,37 @@ package main
 import (
 	"fmt" 
 	"log"
+	"os/exec"
+	
 	"github.com/BurntSushi/xgb"
 	"github.com/BurntSushi/xgb/xinerama"
 	xp "github.com/BurntSushi/xgb/xproto"
 )
 
-var keymap [256][]xp.Keysym
+//var keymap [256][]xp.Keysym
 
-type keybind struct {
-	keys string
-	cmd []string
-}
+//type keybind struct {
+//	keys string
+//	cmd []string
+//}
 
 var (
 	conn *xgb.Conn // connection to the x server
 
-	testcmd = []string{"test1", "test2"}
-	dummy = &keybind{"TESTKEY", testcmd}
+//	testcmd = []string{"test1", "test2"}
+//	dummy = &keybind{"TESTKEY", testcmd}
 //	kb1 = keybind{"mod4","shift","spawn xterm"}
-	keybinds = []*keybind{dummy}
+//	keybinds = []*keybind{dummy}
 )
 
 func init() {
 	log.SetFlags(log.Lshortfile)
+}
+
+/// X Event Handlers ///
+
+func handleConfigureRequest(ev xp.ConfigureRequestEvent) {
+	fmt.Println("Configure request baby")
 }
 
 func setup() {
@@ -51,8 +59,7 @@ func setup() {
 			root,
 			xp.CwEventMask,
 			[]uint32{
-				xp.EventMaskKeyPress|xp.EventMaskKeyRelease|xp.EventMaskButtonPress|
-				xp.EventMaskButtonRelease|xp.EventMaskStructureNotify|xp.EventMaskSubstructureRedirect,}).Check()
+				xp.EventMaskButtonPress|xp.EventMaskButtonRelease|xp.EventMaskStructureNotify|xp.EventMaskSubstructureRedirect,}).Check()
 		if err != nil {
 			if _, ok := err.(xp.AccessError); ok {
 				fmt.Println("Could not become the WM. Is another WM already running?")
@@ -67,34 +74,33 @@ func setup() {
 		hiKey = 255
 	)
 
-	m := xp.GetKeyboardMapping(conn, loKey, hiKey-loKey+1)
+//	m := xp.GetKeyboardMapping(conn, loKey, hiKey-loKey+1)
 
-	reply, err := m.Reply()
-	if err != nil {
-		log.Fatal(err)
-	}
+//	reply, err := m.Reply()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
 
-	if reply == nil {
-		log.Fatal("Could not load keyboard map")
-	}
+//	if reply == nil {
+//		log.Fatal("Could not load keyboard map")
+//	}
 
-	for i := 0; i < hiKey-loKey+1; i++ {
-		keymap[loKey+i] = reply.Keysyms[i*int(reply.KeysymsPerKeycode) : (i+1)*int(reply.KeysymsPerKeycode)]
-	}
+//	for i := 0; i < hiKey-loKey+1; i++ {
+//		keymap[loKey+i] = reply.Keysyms[i*int(reply.KeysymsPerKeycode) : (i+1)*int(reply.KeysymsPerKeycode)]
+//	}
 
-	fmt.Println(keymap)	
+//	fmt.Println(keymap)	
 
 	go startIPC() // start ipc listener
 	
 	fmt.Println("setup done")	
 }
 
-func handleKeypress() {
-	
-}
-
 func main() {
 	setup()
+
+	cmd := exec.Command("/bin/bash", "../examples/mwmrc")
+	go cmd.Run()
 
 	for {
 			ev, xerr := conn.WaitForEvent()
@@ -104,10 +110,10 @@ func main() {
 			}
 			switch v := ev.(type){ // switch statement for X events
 
-			case xp.KeyPressEvent:
-				fmt.Println("Key pressed!", xp.Keysym(v.Detail))
+			case xp.ConfigureRequestEvent:
+				handleConfigureRequest(v)
 			default:
-				fmt.Println(v)
+				fmt.Println(ev)
 			}
 			if xerr != nil {
 				fmt.Printf("Error: %s\n", xerr)
