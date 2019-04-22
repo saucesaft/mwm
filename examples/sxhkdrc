@@ -4,4 +4,4 @@
 
 #terminal
 super + Return
-	xterm
+	termite

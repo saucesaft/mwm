@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
 ## start bindings daemon ##
-sxhkd -c ~/repos/mwm/examples/sxhkdrc
-echo "exito!"
+sxhkd -c ~/repos/mwm/examples/sxhkdrc &
+
+## autostart programs ##
+sh ~/.fehbg
