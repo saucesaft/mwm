@@ -1,7 +1,0 @@
-#
-# example mwm keybinds config
-#
-
-#terminal
-super + Return
-	termite
