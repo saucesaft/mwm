@@ -82,6 +82,10 @@ typedef struct {
 	const Arg arg;
 } Button;
 
+typedef struct {
+	int x, y, w, h;
+} Frame;
+
 typedef struct Monitor Monitor;
 typedef struct Client Client;
 struct Client {
@@ -97,6 +101,7 @@ struct Client {
 	Client *snext;
 	Monitor *mon;
 	Window win;
+	Frame frame; // added frame
 };
 
 typedef struct {
@@ -180,6 +185,7 @@ static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
+static void meta(const Arg *arg);
 //static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
@@ -1039,7 +1045,7 @@ killclient(const Arg *arg)
 		XGrabServer(dpy);
 		XSetErrorHandler(xerrordummy);
 		XSetCloseDownMode(dpy, DestroyAll);
-		XKillClient(dpy, selmon->sel->win);
+		XKillClient(dpy, selmon->sel->win); //kill focus win
 		XSync(dpy, False);
 		XSetErrorHandler(xerror);
 		XUngrabServer(dpy);
@@ -1080,6 +1086,17 @@ manage(Window w, XWindowAttributes *wa)
 	c->y = MAX(c->y, ((c->mon->by == c->mon->my) && (c->x + (c->w / 2) >= c->mon->wx)
 		&& (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
 	c->bw = borderpx;
+
+// meta tilling magic
+
+	Frame f;
+
+	f.x = c->x;
+	f.y = c->y;
+	f.w = c->w;
+	f.h = c->h;
+
+	c->frame = f;
 
 	if (!getpointer(&root, &c->x, &c->y))
 		c->x = c->y = 0;
@@ -1140,6 +1157,17 @@ maprequest(XEvent *e)
 				
 }
 
+void
+meta(const Arg *arg)
+{
+//	struct Client focus = selmon->sel;
+	
+	printf("Y axis: %d", selmon->sel->frame.x);
+	printf("X axis: %d", selmon->sel->frame.y);
+	printf("Width: %d", selmon->sel->frame.w);
+	printf("Heigth: %d", selmon->sel->frame.h);
+	printf("lol, it worked\n");
+}
 /*
 void
 monocle(Monitor *m)
@@ -1195,7 +1223,7 @@ movemouse(const Arg *arg)
 		return;
 	if (!getrootptr(&x, &y))
 		return;
-	do {
+	do { // if the button is pressed, do this
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch(ev.type) {
 		case ConfigureRequest:
@@ -1203,7 +1231,7 @@ movemouse(const Arg *arg)
 		case MapRequest:
 			handler[ev.type](&ev);
 			break;
-		case MotionNotify:
+		case MotionNotify: // if mouse pressed and moved
 			if ((ev.xmotion.time - lasttime) <= (1000 / 60))
 				continue;
 			lasttime = ev.xmotion.time;
