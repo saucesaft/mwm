@@ -1087,6 +1087,11 @@ manage(Window w, XWindowAttributes *wa)
 		&& (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
 	c->bw = borderpx;
 
+	if (!getpointer(&root, &c->x, &c->y))
+		c->x = c->y = 0;
+
+	c->x -= c->w/2;    c->y -= c->h/2;
+
 // meta tilling magic
 
 	Frame f;
@@ -1098,10 +1103,6 @@ manage(Window w, XWindowAttributes *wa)
 
 	c->frame = f;
 
-	if (!getpointer(&root, &c->x, &c->y))
-		c->x = c->y = 0;
-
-	c->x -= c->w/2;    c->y -= c->h/2;
 //	movewindow(client->id, client->x, client->y);
 	XMoveWindow(dpy, c->win, c->x, c->y);
 
@@ -1162,11 +1163,11 @@ meta(const Arg *arg)
 {
 //	struct Client focus = selmon->sel;
 	
-	printf("Y axis: %d", selmon->sel->frame.x);
-	printf("X axis: %d", selmon->sel->frame.y);
-	printf("Width: %d", selmon->sel->frame.w);
-	printf("Heigth: %d", selmon->sel->frame.h);
-	printf("lol, it worked\n");
+	printf("Y: %d", selmon->sel->frame.x);
+	printf(" X: %d", selmon->sel->frame.y);
+	printf(" W: %d", selmon->sel->frame.w);
+	printf(" H: %d", selmon->sel->frame.h);
+	printf("\n");
 }
 /*
 void
@@ -1251,6 +1252,10 @@ movemouse(const Arg *arg)
 				togglefloating(NULL);
 			if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, 1);
+
+			c->frame.x = nx;
+			c->frame.y = ny;
+			
 			break;
 		}
 	} while (ev.type != ButtonRelease);
@@ -1391,7 +1396,13 @@ resizemouse(const Arg *arg)
 			lasttime = ev.xmotion.time;
 
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
+//			printf("%d", nw);
 			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
+//			printf("%d", nh);
+
+			c->frame.w = nw;
+			c->frame.h = nh;
+
 			if (c->mon->wx + nw >= selmon->wx && c->mon->wx + nw <= selmon->wx + selmon->ww
 			&& c->mon->wy + nh >= selmon->wy && c->mon->wy + nh <= selmon->wy + selmon->wh)
 			{
