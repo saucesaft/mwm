@@ -66,6 +66,7 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
+enum { left, right, up, down}; /* where to divide */
 
 typedef union {
 	int i;
@@ -1166,8 +1167,27 @@ meta(const Arg *arg)
 	printf("Y: %d", selmon->sel->frame.x);
 	printf(" X: %d", selmon->sel->frame.y);
 	printf(" W: %d", selmon->sel->frame.w);
-	printf(" H: %d", selmon->sel->frame.h);
-	printf("\n");
+	printf(" H: %d\n", selmon->sel->frame.h);
+/*	switch(arg->v){
+		case left:
+			printf("\nleft");
+			break;
+		case right:
+			printf("\nright");		
+			break;
+		case up:
+			printf("\nup");		
+			break;
+		case down:
+			printf("\ndown");		
+			break;
+		default:
+			break;
+	}*/
+	if ((int)arg->v == left)
+		printf(" left\n");
+	else if ((int)arg->v == right)
+		printf(" right\n");
 }
 /*
 void
