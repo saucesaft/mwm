@@ -1092,6 +1092,9 @@ manage(Window w, XWindowAttributes *wa)
 	if (!getpointer(&root, &c->x, &c->y))
 		c->x = c->y = 0;
 
+	c->x -= c->w/2;
+	c->y -= c->h/2;
+
 // for every window, if one is meta, do the magic
 
 	Client *mc = NULL;
@@ -1106,8 +1109,9 @@ manage(Window w, XWindowAttributes *wa)
 //				XMoveWindow(dpy, c->win, 10, 10);
 //				c->x = mc->frame.x + mc->frame.h/2;
 				mc->h = mc->h/2;
-
+//				printf("%d\n", mc->y);
 				c->y = mc->y + mc->h;
+//				printf("%d\n", c->y);				
 				c->x = mc->x;
 				c->h = mc->h;
 				c->w = mc->w;
@@ -1126,8 +1130,8 @@ manage(Window w, XWindowAttributes *wa)
 		}
 	};
 
-				c->x -= c->w/2;
-				c->y -= c->h/2;
+//				c->x -= c->w/2;
+//				c->y -= c->h/2;
 				
 //				XMoveWindow(dpy, c->win, c->x, c->y);
 
