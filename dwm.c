@@ -66,10 +66,11 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
-enum { left, right, up, down}; /* where to divide */
+enum { MWM_up, MWM_down, MWM_left, MWM_right}; /* where to divide */
 
 typedef union {
-	int i;
+	char* com;
+	const int8_t i;
 	unsigned int ui;
 	float f;
 	const void *v;
@@ -97,7 +98,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int bw, oldbw;
 	unsigned int tags;
-	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
+	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, ismeta; // added meta indicator
 	Client *next;
 	Client *snext;
 	Monitor *mon;
@@ -1091,7 +1092,45 @@ manage(Window w, XWindowAttributes *wa)
 	if (!getpointer(&root, &c->x, &c->y))
 		c->x = c->y = 0;
 
-	c->x -= c->w/2;    c->y -= c->h/2;
+// for every window, if one is meta, do the magic
+
+	Client *mc = NULL;
+	Monitor *mm;
+
+	for (mm = mons; mm; mm = mm->next){ // for each monitor
+		for(mc = mm->clients; mc; mc = mc->next){ // for each client
+			if(mc->ismeta == 1){ // check if any is tilling
+				puts("one meta win found");
+				printf("%d\n", mc->frame.x);
+				c->frame = mc->frame;
+//				XMoveWindow(dpy, c->win, 10, 10);
+//				c->x = mc->frame.x + mc->frame.h/2;
+				mc->h = mc->h/2;
+
+				c->y = mc->y + mc->h;
+				c->x = mc->x;
+				c->h = mc->h;
+				c->w = mc->w;
+//				c->y = 10;
+
+//				XMoveWindow(dpy, c->win, c->x, c->y);
+				
+				mc->ismeta = 0;
+//				break;
+//			} else if(mc->ismeta == 0){
+//				c->x -= c->w/2;
+//				c->y -= c->h/2;
+				
+//				XMoveWindow(dpy, c->win, c->x, c->y);
+			}
+		}
+	};
+
+				c->x -= c->w/2;
+				c->y -= c->h/2;
+				
+//				XMoveWindow(dpy, c->win, c->x, c->y);
+
 
 // meta tilling magic
 
@@ -1105,7 +1144,6 @@ manage(Window w, XWindowAttributes *wa)
 	c->frame = f;
 
 //	movewindow(client->id, client->x, client->y);
-	XMoveWindow(dpy, c->win, c->x, c->y);
 
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
@@ -1161,37 +1199,34 @@ maprequest(XEvent *e)
 
 void
 meta(const Arg *arg)
-{
-//	struct Client focus = selmon->sel;
+{	// if root quit
+	// mark meta win as true
+	// mark the win with meta
+	// mark the direction
 	
-	printf("Y: %d", selmon->sel->frame.x);
-	printf(" X: %d", selmon->sel->frame.y);
-	printf(" W: %d", selmon->sel->frame.w);
-	printf(" H: %d\n", selmon->sel->frame.h);
-/*	switch(arg->v){
-		case left:
-			printf("\nleft");
-			break;
-		case right:
-			printf("\nright");		
-			break;
-		case up:
-			printf("\nup");		
-			break;
-		case down:
-			printf("\ndown");		
-			break;
-		default:
-			break;
-	}*/
-	if ((int)arg->v == left)
-		printf(" left\n");
-	else if ((int)arg->v == right)
-		printf(" right\n");
+	selmon->sel->ismeta = 1;
+	
+	
+//	printf("Y: %d", selmon->sel->frame.x);
+//	printf(" X: %d", selmon->sel->frame.y);
+//	printf(" W: %d", selmon->sel->frame.w);
+//	printf(" H: %d\n", selmon->sel->frame.h);
+
+//		printf("%d\n", *arg->com);
+/*
+	if (arg->i == 0) // up
+		puts("up");
+	else if (arg->i == 1) // down
+		puts("down");
+	else if (arg->i == 2) // left
+		puts("left");
+	else if (arg->i == 3) // right
+		puts("right");
+	else puts("else fired");*/
 }
 /*
 void
-monocle(Monitor *m)
+monocle(Monito *m)
 {
 	unsigned int n = 0;
 	Client *c;
